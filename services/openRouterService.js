@@ -61,9 +61,10 @@ async function generateIdeas(titleId, titleText, instructions, previousIdeas = [
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 30000 // Increase to 30 seconds
     });
-
+    console.log('OpenRouter response reached here:', response.data.choices[0]);
     const toolCall = response.data.choices[0].message.tool_calls[0];
     const ideaData = JSON.parse(toolCall.function.arguments);
 
@@ -90,7 +91,6 @@ async function generateIdeas(titleId, titleText, instructions, previousIdeas = [
       summary: ideaData.summary,
       fullPrompt: ideaData.fullPrompt
     };
-
     return idea;
   } catch (error) {
     console.error('Error generating ideas:', error);

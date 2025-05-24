@@ -461,7 +461,7 @@ function setupEventListeners() {
             // Generate thumbnails
             console.log("Generating thumbnails for title ID:", currentTitle.id, "Quantity:", quantity);
             const generateResponse = await generatePaintings(currentTitle.id, quantity);
-            console.log("Generate thumbnails response:", generateResponse.data);
+            console.log("Generate thumbnails response:", generateResponse?.data);
             
             // Start polling for thumbnail status instead of loading immediately
             pollThumbnailStatus(currentTitle.id, quantity);
@@ -470,11 +470,12 @@ function setupEventListeners() {
             console.log("Refreshing titles list");
             const titlesResponse = await getTitles();
             titles = titlesResponse.data.titles;
-            renderTitlesList();
+            // renderTitlesList();
             
             // No longer call loadThumbnails here immediately
-            // console.log("Loading thumbnails");
-            // await loadThumbnails(currentTitle.id);
+            console.log("Loading thumbnails");
+            await loadThumbnails(currentTitle.id);
+            // alert('pasok na dito')
         } catch (error) {
             console.error('Error generating thumbnails:', error);
             showLoading(false);
@@ -488,8 +489,8 @@ function setupEventListeners() {
                 alert(`Server error (${error.response.status}): ${error.response.data?.error || 'Unknown error'}`);
             } else if (error.request) {
                 // The request was made but no response was received
-                console.error("No response received:", error.request);
-                alert('No response from server. Please check if the backend is running.');
+                console.error("No response1 received:", error.request);
+                alert('No response2 from server. Please check if the backend is running.');
             } else {
                 // Something happened in setting up the request that triggered an Error
                 console.error("Request setup error:", error.message);

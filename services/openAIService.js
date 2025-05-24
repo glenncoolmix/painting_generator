@@ -95,8 +95,8 @@ async function generateImage(ideaId, prompt, references = []) {
           console.error('Response data:', JSON.stringify(error.response.data, null, 2));
           throw new Error(`OpenAI API error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
         } else if (error.request) {
-          console.error('No response received');
-          throw new Error('No response received from OpenAI API');
+          console.error('No response3 received');
+          throw new Error('No response4 received from OpenAI API');
         } else {
           console.error('Error message:', error.message);
           throw error;
@@ -136,8 +136,8 @@ async function generateImage(ideaId, prompt, references = []) {
           console.error('Response data:', JSON.stringify(error.response.data, null, 2));
           throw new Error(`OpenAI API error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
         } else if (error.request) {
-          console.error('No response received');
-          throw new Error('No response received from OpenAI API');
+          console.error('No response5 received');
+          throw new Error('No response6 received from OpenAI API');
         } else {
           console.error('Error message:', error.message);
           throw error;
