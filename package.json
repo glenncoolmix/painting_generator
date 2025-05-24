@@ -4,7 +4,7 @@
   "description": "API for generating paintings using AI",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js -p 3000",
     "dev": "nodemon server.js",
     "build": "vite build"
   },
