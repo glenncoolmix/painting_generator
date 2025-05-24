@@ -73,68 +73,68 @@ async function generatePaintings(req, res) {
         [...prevIdeas, ...newIdeas] // Include previously generated ideas to avoid repetition
       );
 	  
-    //   newIdeas.push(idea);
+      newIdeas.push(idea);
       
-    //   // Create painting entry in processing state
-    //   const paintingParams = [titleId, idea.id, 'pending'];
-    //   if (paintingParams.some(p => p === undefined)) {
-    //     console.error('Attempted to execute query with undefined parameter:', { paintingParams });
-    //     return res.status(500).json({ error: 'Internal server error: Invalid query parameter detected' });
-    //   }
+      // Create painting entry in processing state
+      const paintingParams = [titleId, idea.id, 'pending'];
+      if (paintingParams.some(p => p === undefined)) {
+        console.error('Attempted to execute query with undefined parameter:', { paintingParams });
+        return res.status(500).json({ error: 'Internal server error: Invalid query parameter detected' });
+      }
       
-    //   await pool.execute(
-    //     'INSERT INTO paintings (title_id, idea_id, status) VALUES (?, ?, ?)',
-    //     paintingParams
-    //   );
+      await pool.execute(
+        'INSERT INTO paintings (title_id, idea_id, status) VALUES (?, ?, ?)',
+        paintingParams
+      );
     }
     
-    console.log('andito yan')
+
+    // Start image generation in parallel (respecting MAX_PARALLEL limit)
+    const processIdeas = async () => {
+      const pendingIdeas = [...newIdeas];
+      const activePromises = [];
+      
+      const startNextIdea = () => {
+        if (pendingIdeas.length === 0) return;
+        
+        const idea = pendingIdeas.shift();
+        const promise = openAIService.generateImage(idea.id, idea.fullPrompt, references)
+          .catch(error => console.error(`Error generating image for idea ${idea.id}:`, error))
+          .finally(() => {
+            // When one finishes, start another if available
+            const index = activePromises.indexOf(promise);
+            if (index !== -1) activePromises.splice(index, 1);
+            startNextIdea();
+          });
+        
+        activePromises.push(promise);
+      };
+      
+      // Start initial batch
+      const initialBatch = Math.min(MAX_PARALLEL, pendingIdeas.length);
+      for (let i = 0; i < initialBatch; i++) {
+        startNextIdea();
+      }
+    };
+    // Start processing in background
+    processIdeas();
+    
+    // console.log('andito yan', newIdeas)
 	// return false;
 
-    // // Start image generation in parallel (respecting MAX_PARALLEL limit)
-    // const processIdeas = async () => {
-    //   const pendingIdeas = [...newIdeas];
-    //   const activePromises = [];
-      
-    //   const startNextIdea = () => {
-    //     if (pendingIdeas.length === 0) return;
-        
-    //     const idea = pendingIdeas.shift();
-    //     const promise = openAIService.generateImage(idea.id, idea.fullPrompt, references)
-    //       .catch(error => console.error(`Error generating image for idea ${idea.id}:`, error))
-    //       .finally(() => {
-    //         // When one finishes, start another if available
-    //         const index = activePromises.indexOf(promise);
-    //         if (index !== -1) activePromises.splice(index, 1);
-    //         startNextIdea();
-    //       });
-        
-    //     activePromises.push(promise);
-    //   };
-      
-    //   // Start initial batch
-    //   const initialBatch = Math.min(MAX_PARALLEL, pendingIdeas.length);
-    //   for (let i = 0; i < initialBatch; i++) {
-    //     startNextIdea();
-    //   }
-    // };
-    // // Start processing in background
-    // // processIdeas();
-    
 
 
 
-
-    // // Return immediately with the generated ideas
-    // res.status(200).json({
-    //   message: `Started generating ${quantity} paintings`,
-    //   ideas: newIdeas
-    // });
     // Return immediately with the generated ideas
     res.status(200).json({
-      message: `Started generating 5 paintings`,
-      ideas: []
+      message: `Started generating ${quantity} paintings`,
+      ideas: newIdeas
     });
+    // // Return immediately with the generated ideas
+    // res.status(200).json({
+    //   message: `Started generating 5 paintings`,
+    //   ideas: []
+    // });
   } catch (error) {
     console.error('Error in generatePaintings:', error);
     res.status(500).json({ error: 'Failed to generate paintings' });

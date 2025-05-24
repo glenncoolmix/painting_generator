@@ -461,12 +461,12 @@ function setupEventListeners() {
             // Generate thumbnails
             console.log("Generating thumbnails for title ID:", currentTitle.id, "Quantity:", quantity);
             const generateResponse = await generatePaintings(currentTitle.id, quantity);
-            console.log("Generate thumbnails response:", generateResponse?.data);
+            // console.log("Generate thumbnails response:", generateResponse?.data);
             
             // Start polling for thumbnail status instead of loading immediately
             pollThumbnailStatus(currentTitle.id, quantity);
 
-            // Refresh titles list after starting generation/polling
+            // // Refresh titles list after starting generation/polling
             console.log("Refreshing titles list");
             const titlesResponse = await getTitles();
             titles = titlesResponse.data.titles;
@@ -490,7 +490,7 @@ function setupEventListeners() {
             } else if (error.request) {
                 // The request was made but no response was received
                 console.error("No response1 received:", error.request);
-                alert('No response2 from server. Please check if the backend is running.');
+                // alert('No response2 from server. Please check if the backend is running.');
             } else {
                 // Something happened in setting up the request that triggered an Error
                 console.error("Request setup error:", error.message);

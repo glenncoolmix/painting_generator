@@ -64,7 +64,6 @@ async function generateIdeas(titleId, titleText, instructions, previousIdeas = [
       },
       timeout: 30000 // Increase to 30 seconds
     });
-    console.log('OpenRouter response reached here:', response.data.choices[0]);
     const toolCall = response.data.choices[0].message.tool_calls[0];
     const ideaData = JSON.parse(toolCall.function.arguments);
 
@@ -86,11 +85,18 @@ async function generateIdeas(titleId, titleText, instructions, previousIdeas = [
     );
 
     const idea = {
-      id: result.insertId,
+      id: result?.id || result.insertId, // Use insertId for MySQL
       titleId,
       summary: ideaData.summary,
       fullPrompt: ideaData.fullPrompt
     };
+    // const idea = {
+    //   id: result.insertId,
+    //   titleId,
+    //   summary: ideaData.summary,
+    //   fullPrompt: ideaData.fullPrompt
+    // };
+    console.error('ideaData', ideaData)
     return idea;
   } catch (error) {
     console.error('Error generating ideas:', error);
